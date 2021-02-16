@@ -251,7 +251,6 @@ def lock():
                 session.pop('timelock', None)
                 return False
         session['timelock'] = datetime.now() + yolo.timedelta(0,5) 
-        print((session['timelock'] - datetime.now()).seconds)
         return True
     return False
 
