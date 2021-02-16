@@ -232,7 +232,8 @@ def checkDict(word, username):
     res = [word[i: j] for i in range(len(word)) 
           for j in range(i + 1, len(word) + 1)] 
 
-    
+    res = list(sorted(res, key = len))
+    #Cuts username from spaces
     for x in range(len(username)):
         if(username[x] != " "):
             temp += username[x]
@@ -241,16 +242,16 @@ def checkDict(word, username):
             temp=""
         if(x == len(username)-1):
             names.append(temp)
-    #Checks if password contains dictionary words and if password has a username      
+    #Checks if password contains dictionary words and if password has a username    
     for words in res:
         if len(words) < 4:
             continue
         elif (words in names):
             error = "Username cannot be in password"
-            return error
-        elif words in english_words_set:
+            break
+        elif (words.lower() in english_words_set):
             error = "Dictionary Word detected"
-            return error
+            break
         else:
             error = " "
     return error
@@ -271,7 +272,5 @@ def lock():
 #Function to get validity of date
 def numOfDays(date1, date2):
     return (date2-date1).days
-
-
 
 app.run(debug=True)
