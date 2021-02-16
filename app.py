@@ -8,7 +8,14 @@ import datetime as yolo
 
 app = Flask(__name__)
 
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'securitylogin'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 
+mysql = MySQL(app)
 
 #@TODO Make Login attempts
 
@@ -244,6 +251,7 @@ def lock():
                 session.pop('timelock', None)
                 return False
         session['timelock'] = datetime.now() + yolo.timedelta(0,5) 
+
         return True
     return False
 
