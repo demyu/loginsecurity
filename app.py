@@ -8,6 +8,7 @@ import datetime as yolo
 
 app = Flask(__name__)
 
+#Config for database
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
@@ -17,14 +18,14 @@ app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 
 mysql = MySQL(app)
 
-#@TODO Make Login attempts
-
+#Starting pagee of the website
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/welcome')
 def welcome():
+    #Creates a session if no sesssion is present
     if 'created_at' in session:
         createdat = session['created_at']
         return render_template('welcome.html', username = session['username'], created_at = createdat)
@@ -33,25 +34,30 @@ def welcome():
     else:
         return redirect(url_for('index'))
 
+#Login Module
 @app.route('/login', methods=['GET','POST'])
 def login():
     error = ""
+    #Creates a lock session if none is found
     if 'lock' not in session:
         session['lock'] = 0
 
     if request.method == 'POST':
-
+        #Checks if lock limit is reached
         if(not lock()):
+            #Gets the form from the login module
             today = date.today()
             username = request.form['username']
             password = request.form['password']
 
+            #Checks if username is in database
             cur = mysql.connection.cursor()
             cur.execute("SELECT id FROM users where username = %s" , [username])
             userid = cur.fetchone()
             cur.close()
 
             if(userid != None and len(username) != 0):
+                #Checks if password is in correct with username
                 userid = userid['id']
                 cur = mysql.connection.cursor()
                 cur.execute("SELECT password, created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
@@ -59,6 +65,7 @@ def login():
                 cur.close()
 
                 if(activePass != None and len(activePass) !=0):
+                    #Checks if password hashed is correct with the inputted password
                     if(check_password_hash(activePass['password'], password)):
                         session['username'] = username
                         session['id'] = userid
@@ -69,7 +76,8 @@ def login():
                         datetimeobject = datetime.strptime(created_at,'%Y-%m-%d')
                         date1 = datetimeobject.strftime('%Y,%m,%d')
                         date1 = datetime.strptime(date1,'%Y,%m,%d').date()
-
+                        
+                        #Checks the validity/expiration of password
                         if(numOfDays(date1, today)> 30):
                             session.pop('username', None)
                             session.pop('lock', None)
@@ -93,6 +101,7 @@ def login():
     else:
         return render_template('index.html')
 
+#Destroys session
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -104,6 +113,7 @@ def logout():
 @app.route('/register' ,methods=['GET','POST'])
 def register():
     if request.method == 'POST':
+        #Gets form from register module
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
@@ -148,7 +158,8 @@ def checkPass():
     if request.method == 'POST':
         username = request.form['username']
         data = request.form['password']
-    
+
+        #Checks password validation
         regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
         regex2 = re.compile('[a-zA-Z]')
         
@@ -173,6 +184,7 @@ def updatePassword():
         listofPassword = cur.fetchall()
         cur.close()
 
+        #Checks if password is in the last 6 passwords
         for pasowordo in listofPassword:
             if check_password_hash(pasowordo['password'], password):
                 return "Password already used"
@@ -216,7 +228,7 @@ def checkDict(word, username):
     temp = ""
     username = str(username)
     word = str(word)
-
+    #Subtring of a string
     res = [word[i: j] for i in range(len(word)) 
           for j in range(i + 1, len(word) + 1)] 
 
@@ -229,7 +241,7 @@ def checkDict(word, username):
             temp=""
         if(x == len(username)-1):
             names.append(temp)
-            
+    #Checks if password contains dictionary words and if password has a username      
     for words in res:
         if len(words) < 4:
             continue
@@ -243,6 +255,7 @@ def checkDict(word, username):
             error = " "
     return error
 
+#Lock module if password or username fails
 def lock():
     if session['lock'] >= 3:
         if 'timelock' in session:
