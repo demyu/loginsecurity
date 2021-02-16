@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css" />
+</head>
+
+<body>
+    <!------ Include the above in your HEAD tag ---------->
+
+    <div class="sidenav">
+        <div class="login-main-text">
+            <h2>
+                Application<br />
+                Login Page
+            </h2>
+            <p>Login or register from here to access the application.</p>
+        </div>
+    </div>
+    <div class="main">
+        <div class="col-md-6 col-sm-12" id="loginCont">
+            <div class="login-form">
+                <form action="/login" id="loginform" method="post">
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <input type="text" name="username" class="form-control" placeholder="User Name" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required />
+                    </div>
+                    <p style="color: red;">{{error}}</p>
+                    <button type="submit" class="btn btn-blue">Login</button>
+                </form>
+                <button class="btn btn-green" onclick="loadFunc()">Register</button>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12" id="registerCont"  style="display: none">
+            <div class="login-form">
+                <form action="/register" id="registerform" method="post">
+                    <div class="form-group">
+                        <label>User Name</label>
+                        <input type="text" name="username" class="form-control" placeholder="User Name" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" oninput="passwordChecker()" name="password" class="form-control" placeholder="Password" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" oninput="registerValidateForm()" id="confirmPassword" name="confirmpassword" class="form-control" placeholder="Password" required disabled/>
+                    </div>
+                    <p id="errorMessage" style="color: red;"> </p>
+                    <button type="submit" id="registerBtn" class="btn btn-blue" disabled>Register</button>
+                </form>
+                <button class="btn btn-green" onclick="loadFunc()"> Login </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<!-- @TODO AJAX FOR Register check password and cpassword-->
+
+<script>
+
+    function registerValidateForm() {
+        var x = document.forms["registerform"]["password"].value;
+        var y = document.forms["registerform"]["confirmpassword"].value;
+
+        if (x != y) {
+          document.getElementById('errorMessage').innerHTML = "Passwords do not match";
+          document.getElementById("registerBtn").disabled = true;
+        }else{
+          document.getElementById('errorMessage').innerHTML = "";
+          document.getElementById("registerBtn").disabled = false;
+        }
+    }
+
+
+    function passwordChecker(){
+        var x = document.forms["registerform"]["username"].value;
+        var y = document.forms["registerform"]["password"].value;
+
+        //When user deletes password
+        if(y.length <10){
+            document.getElementById("confirmPassword").disabled = true;
+            document.getElementById("registerBtn").disabled = true;
+            document.getElementById("confirmPassword").value="";
+        }
+
+        //Checks if length of the password is greater than 10
+        if(y.length >=10){
+            $.ajax({ 
+                url: '/checkPass', 
+                type: 'POST', 
+                data: {'password': y, 'username': x},
+                success: function(response){ 
+                    if(response == " "){
+                        document.getElementById("confirmPassword").disabled = false;
+                        document.getElementById('errorMessage').innerHTML = response;
+                    }else{
+                        document.getElementById('errorMessage').innerHTML = response;
+                        document.getElementById("registerBtn").disabled = true;
+                        document.getElementById("confirmPassword").disabled = true;
+                    }
+                    
+                } 
+            })
+        }else{
+            document.getElementById('errorMessage').innerHTML = "Password Length must be 10 characters or more";
+        }
+    }
+
+    function loadFunc() {
+        var register = document.getElementById("registerbtn");
+        var login = document.getElementById("registerbtn");
+        var loginCont = document.getElementById("loginCont");
+        var registerCont = document.getElementById("registerCont");
+
+        if (registerCont.style.display === "none") {
+            $("#loginform")[0].reset();
+            registerCont.style.display = "block";
+            loginCont.style.display = "none";
+        } else {
+            loginCont.style.display = "block";
+            registerCont.style.display = "none";
+            $("#registerform")[0].reset();
+        }
+    }
+</script>
+
+</html>
