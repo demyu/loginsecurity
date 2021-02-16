@@ -90,6 +90,8 @@ def login():
                             session.pop('lock', None)
                             return redirect(url_for('welcome'))
                     error = "Password does not match"
+                    if 'lock' not in session:
+                        session['lock'] = 0
                     session['lock'] = int(session['lock']) + 1
                     return render_template('index.html', error = error)
             error = "Username Does not exist"
