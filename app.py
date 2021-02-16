@@ -82,7 +82,7 @@ def login():
                             session.pop('username', None)
                             session.pop('lock', None)
                             return redirect(url_for('forceChange'))
-                        elif(numOfDays(date1,today) >20):
+                        elif(numOfDays(date1,today) >10):
                             session['created_at'] = numOfDays(date1,today)
                             session.pop('lock', None)
                             return redirect(url_for('welcome'))
@@ -96,7 +96,7 @@ def login():
             session['lock'] = int(session['lock']) + 1
             return render_template('index.html', error = error)
         else:
-            error = "Try again in "+ str(session['timelock'].strftime("%H:%M:%S"))
+            error = "Try again at "+ str(session['timelock'].strftime("%H:%M:%S"))
             return render_template('index.html', error = error)
     else:
         return render_template('index.html')
