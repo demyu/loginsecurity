@@ -4,6 +4,7 @@ from english_words import english_words_set
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from datetime import datetime, date
+import datetime as yolo
 
 app = Flask(__name__)
 
@@ -26,7 +27,6 @@ def index():
 def welcome():
     if 'created_at' in session:
         createdat = session['created_at']
-        print(createdat)
         return render_template('welcome.html', username = session['username'], created_at = createdat)
     elif 'username' in session:
         return render_template('welcome.html', username = session['username'], created_at = "")
@@ -36,49 +36,60 @@ def welcome():
 @app.route('/login', methods=['GET','POST'])
 def login():
     error = ""
+    if 'lock' not in session:
+        session['lock'] = 0
+
     if request.method == 'POST':
 
-        today = date.today()
+        if(not lock()):
+            today = date.today()
+            username = request.form['username']
+            password = request.form['password']
 
-        username = request.form['username']
-        password = request.form['password']
-
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT id FROM users where username = %s" , [username])
-        userid = cur.fetchone()
-        cur.close()
-
-        if(userid != None and len(username) != 0):
-            userid = userid['id']
             cur = mysql.connection.cursor()
-            cur.execute("SELECT password, created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
-            activePass = cur.fetchone()
+            cur.execute("SELECT id FROM users where username = %s" , [username])
+            userid = cur.fetchone()
             cur.close()
 
-            if(activePass != None and len(activePass) !=0):
-                if(check_password_hash(activePass['password'], password)):
-                    session['username'] = username
-                    session['id'] = userid
+            if(userid != None and len(username) != 0):
+                userid = userid['id']
+                cur = mysql.connection.cursor()
+                cur.execute("SELECT password, created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
+                activePass = cur.fetchone()
+                cur.close()
 
-                    #Checks validity of password
-                    created_at = str(activePass['created_at'])
+                if(activePass != None and len(activePass) !=0):
+                    if(check_password_hash(activePass['password'], password)):
+                        session['username'] = username
+                        session['id'] = userid
 
-                    datetimeobject = datetime.strptime(created_at,'%Y-%m-%d')
-                    date1 = datetimeobject.strftime('%Y,%m,%d')
-                    date1 = datetime.strptime(date1,'%Y,%m,%d').date()
+                        #Checks validity of password
+                        created_at = str(activePass['created_at'])
 
-                    if(numOfDays(date1, today)> 30):
-                        session.pop('username', None)
-                        return redirect(url_for('forceChange'))
-                    elif(numOfDays(date1,today) >20):
-                        session['created_at'] = numOfDays(date1,today)
-                        return redirect(url_for('welcome'))
-                    else:
-                        return redirect(url_for('welcome'))
-                error = "Password does not match"
-                return render_template('index.html', error = error)
-        error = "Username Does not exist"
-        return render_template('index.html', error = error)
+                        datetimeobject = datetime.strptime(created_at,'%Y-%m-%d')
+                        date1 = datetimeobject.strftime('%Y,%m,%d')
+                        date1 = datetime.strptime(date1,'%Y,%m,%d').date()
+
+                        if(numOfDays(date1, today)> 30):
+                            session.pop('username', None)
+                            session.pop('lock', None)
+                            return redirect(url_for('forceChange'))
+                        elif(numOfDays(date1,today) >20):
+                            session['created_at'] = numOfDays(date1,today)
+                            session.pop('lock', None)
+                            return redirect(url_for('welcome'))
+                        else:
+                            session.pop('lock', None)
+                            return redirect(url_for('welcome'))
+                    error = "Password does not match"
+                    session['lock'] = int(session['lock']) + 1
+                    return render_template('index.html', error = error)
+            error = "Username Does not exist"
+            session['lock'] = int(session['lock']) + 1
+            return render_template('index.html', error = error)
+        else:
+            error = "Try again in "+ str(session['timelock'].strftime("%H:%M:%S"))
+            return render_template('index.html', error = error)
     else:
         return render_template('index.html')
 
@@ -232,22 +243,22 @@ def checkDict(word, username):
             error = " "
     return error
 
-def loginattempt(username):
-    cur = mysql.connection.cursor()
-    cur.execute("Select loginattempt from users where username = %s" , [username])
-    loginattempt = cur.fetchone()
-    cur.close()
-
-    if(loginattempt['loginattempt'] == '3'):
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (isSuspended) VALUES (%s) where " , (userid, password,1))
-        mysql.connection.commit()
-        cur.close()
-
-
+def lock():
+    if session['lock'] >= 3:
+        if 'timelock' in session:
+            if ((session['timelock'] + yolo.timedelta(0,0)) <= (datetime.now() +yolo.timedelta(0,0))):
+                session.pop('lock', None)
+                session.pop('timelock', None)
+                return False
+        session['timelock'] = datetime.now() + yolo.timedelta(0,5) 
+        print((session['timelock'] - datetime.now()).seconds)
+        return True
+    return False
 
 #Function to get validity of date
 def numOfDays(date1, date2):
     return (date2-date1).days
+
+
 
 app.run(debug=True)
