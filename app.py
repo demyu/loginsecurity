@@ -8,14 +8,7 @@ import datetime as yolo
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'securitylogin'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 
-mysql = MySQL(app)
 
 #@TODO Make Login attempts
 
