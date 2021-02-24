@@ -2,7 +2,7 @@ from flask import Flask, render_template, request,redirect, url_for, session
 from flask_mysqldb import MySQL
 from english_words import english_words_set
 from werkzeug.security import generate_password_hash, check_password_hash
-import re
+import re, requests
 from datetime import datetime, date
 import datetime as yolo
 
@@ -28,9 +28,13 @@ def welcome():
     #Creates a session if no sesssion is present
     if 'created_at' in session:
         createdat = session['created_at']
-        return render_template('welcome.html', username = session['username'], created_at = createdat)
+        horoscope = session['horoscope']
+        data = dailyHoroscope(horoscope)
+        return render_template('welcome.html', username = session['username'], created_at = createdat, horoscope = data, horoscopeName = horoscope)
     elif 'username' in session:
-        return render_template('welcome.html', username = session['username'], created_at = "")
+        horoscope = session['horoscope']
+        data = dailyHoroscope(horoscope)
+        return render_template('welcome.html', username = session['username'], created_at = "", horoscope = data, horoscopeName = horoscope)
     else:
         return redirect(url_for('index'))
 
@@ -52,12 +56,13 @@ def login():
 
             #Checks if username is in database
             cur = mysql.connection.cursor()
-            cur.execute("SELECT id FROM users where username = %s" , [username])
+            cur.execute("SELECT * FROM users where username = %s" , [username])
             userid = cur.fetchone()
             cur.close()
 
             if(userid != None and len(username) != 0):
                 #Checks if password is in correct with username
+                horos = userid['horoscope']
                 userid = userid['id']
                 cur = mysql.connection.cursor()
                 cur.execute("SELECT password, created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
@@ -69,6 +74,7 @@ def login():
                     if(check_password_hash(activePass['password'], password)):
                         session['username'] = username
                         session['id'] = userid
+                        session['horoscope'] = horos
 
                         #Checks validity of password
                         created_at = str(activePass['created_at'])
@@ -119,6 +125,7 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        horoscope = request.form['horoscope']
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM users where username = %s" , [username])
@@ -132,7 +139,7 @@ def register():
 
             #Insert username password to database 
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO users (username, email) VALUES (%s,%s)" , (username, email))
+            cur.execute("INSERT INTO users (username, email, horosope) VALUES (%s,%s)" , (username, email, horoscope))
             mysql.connection.commit()
             cur.close()
 
@@ -275,4 +282,30 @@ def lock():
 def numOfDays(date1, date2):
     return (date2-date1).days
 
+def dailyHoroscope(horoscope):
+    url = "https://sameer-kumar-aztro-v1.p.rapidapi.com/"
+    querystring = {"sign": str(horoscope),"day":"today"}
+    headers = {
+        'x-rapidapi-key': "515b8b336amsh2436fb4f5ef076ep184143jsn8d433aaad72f",
+        'x-rapidapi-host': "sameer-kumar-aztro-v1.p.rapidapi.com"
+    }
+    response = requests.request("POST", url, headers=headers, params=querystring)
+
+    return response.json()
+    #Aries
+    #Taurus
+    #Gemini
+    #Cancer
+    #Leo
+    #Virgo
+    #Libra
+    #Scorpio
+    #Sagittarius
+    #Capricorn
+    #Aquarius
+    #Pisces
+
+    #today
+    #yesterday
+    #tomorrow
 app.run(debug=True)
