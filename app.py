@@ -139,7 +139,7 @@ def register():
 
             #Insert username password to database 
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO users (username, email, horosope) VALUES (%s,%s)" , (username, email, horoscope))
+            cur.execute("INSERT INTO users (username, email, horoscope) VALUES (%s,%s,%s)" , (username, email, horoscope))
             mysql.connection.commit()
             cur.close()
 
