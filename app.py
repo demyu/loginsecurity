@@ -6,7 +6,7 @@ import re, requests
 from datetime import datetime, date
 import datetime as yolo
 
-app = Flask(__name__,template_folder='Template')
+app = Flask(__name__)
 
 #Config for database
 app.config['MYSQL_HOST'] = 'localhost'
