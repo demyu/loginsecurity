@@ -309,4 +309,3 @@ def dailyHoroscope(horoscope):
     #yesterday
     #tomorrow
     #
-app.run(debug=True)
