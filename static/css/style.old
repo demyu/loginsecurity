@@ -1,20 +1,18 @@
 body {
-    font-family: "Segoe UI";
-    background-image: url('background.jpg');
-    background-size: cover;
-    color: rgb(255, 255, 255);
+    font-family: "Lato", sans-serif;
 }
+
+
 
 .main-head{
     height: 150px;
+    background: #FFF;
    
 }
 
-
-
-.sidenav{
+.sidenav {
     height: 100%;
-    background-color: rgba(31, 31, 31, 0.582);
+    background-color: #000;
     overflow-x: hidden;
     padding-top: 20px;
 }
@@ -72,13 +70,13 @@ body {
 }
 
 .btn-blue{
-    background-color: rgb(46, 228, 91) !important;
+    background-color: rgb(44, 23, 240) !important;
     color: #fff;
     width: 50%;
 }
 
 .btn-green{
-    background-color: rgb(46, 107, 117) !important;
+    background-color: rgb(13, 238, 81) !important;
     color: #fff;
     width: 50%;
 }
