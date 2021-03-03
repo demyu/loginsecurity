@@ -65,7 +65,7 @@ def login():
                 horos = userid['horoscope']
                 userid = userid['id']
                 cur = mysql.connection.cursor()
-                cur.execute("SELECT password, DATE(created_at) FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
+                cur.execute("SELECT password, DATE(created_at) as created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
                 activePass = cur.fetchone()
                 cur.close()
 
