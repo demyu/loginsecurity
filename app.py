@@ -9,10 +9,10 @@ import datetime as yolo
 app = Flask(__name__)
 
 #Config for database
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'securitylogin'
+app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
+app.config['MYSQL_USER'] = 'be46b56a23df04'
+app.config['MYSQL_PASSWORD'] = '9f8e51cc'
+app.config['MYSQL_DB'] = 'heroku_d9dccebc3492f63'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 

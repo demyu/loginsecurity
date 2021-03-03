@@ -31,7 +31,7 @@ CREATE TABLE `userpasswords` (
   `id` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `password` varchar(150) DEFAULT NULL,
-  `created_at` date NOT NULL DEFAULT current_timestamp(),
+  `created_at` DATETIME NOT NULL DEFAULT current_timestamp,
   `isActive` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
