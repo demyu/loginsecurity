@@ -9,7 +9,7 @@ import smtplib, ssl
 
 app = Flask(__name__)
 
-Config for database
+#Config for database
 app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
 app.config['MYSQL_USER'] = 'be46b56a23df04'
 app.config['MYSQL_PASSWORD'] = '9f8e51cc'
