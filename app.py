@@ -40,13 +40,13 @@ def welcome():
         data = dailyHoroscope(horoscope)
         
         horos_id = inputToHoroscope(horoscope, data['color'], data['compatibility'], data['lucky_number'], data['description'])
-        link = "seclogin.heroku.com/share/" + horos_id
+        link = "seclogin.heroku.com/sharer/" + horos_id
         return render_template('welcome.html', username = session['username'], created_at = createdat, horoscope = data, horoscopeName = horoscope , link = link)
     elif 'username' in session:
         horoscope = session['horoscope']
         data = dailyHoroscope(horoscope)
         horos_id = inputToHoroscope(horoscope, data['color'], data['compatibility'], data['lucky_number'], data['description'])
-        link = "seclogin.heroku.com/share/" + horos_id
+        link = "seclogin.heroku.com/sharer/" + horos_id
         return render_template('welcome.html', username = session['username'], created_at = "", horoscope = data, horoscopeName = horoscope, link = link)
     else:
         return redirect(url_for('index'))
