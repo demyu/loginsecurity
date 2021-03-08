@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horoscope</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link href="/static/css/welcome.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="hero-full-container background-image-container white-text-container"
+        style="background-image:url('/static/images/moon.jpeg')">
+        <div class="overlay-gradient"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-7 col-md-offset-1">
+                    <div class="hero-full-wrapper">
+                        <div class="text-content">
+                            <h1>{{horoscope['horoscopeName'].upper()}} - {{horoscope['dateToday']}}</h1>
+                            <p>{{horoscope['description']}}</p>
+                            <p>Color: {{horoscope['color']}}</p>
+                            <p>Compatibility: {{horoscope['compatibility']}}</p>
+                            <p>Lucky Number: {{horoscope['luckyNumber']}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

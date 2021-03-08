@@ -5,16 +5,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import re, requests
 from datetime import datetime, date
 import datetime as yolo
+import smtplib, ssl
 
 app = Flask(__name__)
 
-#Config for database
+Config for database
 app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
 app.config['MYSQL_USER'] = 'be46b56a23df04'
 app.config['MYSQL_PASSWORD'] = '9f8e51cc'
 app.config['MYSQL_DB'] = 'heroku_d9dccebc3492f63'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
+
+#app.config['MYSQL_HOST'] = 'localhost'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD'] = ''
+#app.config['MYSQL_DB'] = 'securitylogin'
+#app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+#app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 
 mysql = MySQL(app)
 
@@ -30,11 +38,16 @@ def welcome():
         createdat = session['created_at']
         horoscope = session['horoscope']
         data = dailyHoroscope(horoscope)
-        return render_template('welcome.html', username = session['username'], created_at = createdat, horoscope = data, horoscopeName = horoscope)
+        
+        horos_id = inputToHoroscope(horoscope, data['color'], data['compatibility'], data['lucky_number'], data['description'])
+        link = "seclogin.heroku.com/share/" + horos_id
+        return render_template('welcome.html', username = session['username'], created_at = createdat, horoscope = data, horoscopeName = horoscope , link = link)
     elif 'username' in session:
         horoscope = session['horoscope']
         data = dailyHoroscope(horoscope)
-        return render_template('welcome.html', username = session['username'], created_at = "", horoscope = data, horoscopeName = horoscope)
+        horos_id = inputToHoroscope(horoscope, data['color'], data['compatibility'], data['lucky_number'], data['description'])
+        link = "seclogin.heroku.com/share/" + horos_id
+        return render_template('welcome.html', username = session['username'], created_at = "", horoscope = data, horoscopeName = horoscope, link = link)
     else:
         return redirect(url_for('index'))
 
@@ -308,3 +321,43 @@ def dailyHoroscope(horoscope):
     #today
     #yesterday
     #tomorrow
+
+@app.route('/sendPass')
+def sendPass():
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "secloginzodiac@gmail.com"  # Enter your address
+    receiver_email = "vademjanus@gmail.com"  # Enter receiver address
+    password = "Seclogin51@"
+    message = """\
+    Subject: Hi there
+
+    This message is sent from Python."""
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+
+@app.route('/sharer/<id>')
+def share(id):
+    postId = id
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM horoscopes where id = %s" , [postId])
+    post = cur.fetchone()
+    cur.close()
+
+    return render_template('sharer.html', horoscope = post)
+
+def inputToHoroscope(horoscopeName,color,compatibility,luckyNumber,description):
+    today = date.today()
+    d2 = today.strftime("%B %d, %Y")
+
+    #Insert to database
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO horoscopes (horoscopeName,dateToday, color, compatibility,luckyNumber,description) VALUES (%s,%s,%s,%s,%s,%s);" , (horoscopeName,d2, color, compatibility,luckyNumber,description))
+    mysql.connection.commit()
+    lastid =cur.lastrowid
+    cur.close()
+
+    return str(lastid)
