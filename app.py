@@ -361,3 +361,5 @@ def inputToHoroscope(horoscopeName,color,compatibility,luckyNumber,description):
     cur.close()
 
     return str(lastid)
+
+app.run(debug=True)

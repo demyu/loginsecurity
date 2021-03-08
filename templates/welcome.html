@@ -10,12 +10,12 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <link href="static/css/welcome.css" rel="stylesheet">
-    
-    <meta property="og:url"           content="{{link}}" />
-    <meta property="og:type"          content="website" />
-    <meta property="og:title"         content="Horoscope" />
-    <meta property="og:description"   content="Your description" />
-    <meta property="og:image"         content="#" />
+
+    <meta property="og:url" content="{{link}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Horoscope" />
+    <meta property="og:description" content="Your description" />
+    <meta property="og:image" content="#" />
 </head>
 
 <body>
@@ -35,13 +35,19 @@
                         </div>
 
                         <a class="btn btn-secondary" href="{{url_for('logout')}}" role="button">Logout</a>
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">Change Password</button>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal"
+                            data-target="#myModal">Change Password</button>
                         <div id="fb-root"></div>
-                        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v10.0" nonce="Q7ZDwrTs"></script>
-                        <div class="fb-share-button" data-href="{{link}}" data-layout="button_count" data-size="small">
-                            <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">
-                                Share
-                            </a>
+                        <script>(function (d, s, id) {
+                                var js, fjs = d.getElementsByTagName(s)[0];
+                                if (d.getElementById(id)) return;
+                                js = d.createElement(s); js.id = id;
+                                js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+                                fjs.parentNode.insertBefore(js, fjs);
+                            }(document, 'script', 'facebook-jssdk'));
+                        </script>
+                        
+                            <div class="fb-share-button" data-href="{{link}}" data-layout="button_count">
                         </div>
                     </div>
                 </div>
