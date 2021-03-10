@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 24, 2021 at 02:49 PM
+-- Generation Time: Mar 10, 2021 at 05:02 PM
 -- Server version: 10.4.17-MariaDB
 -- PHP Version: 8.0.1
 
@@ -31,23 +31,24 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `horoscope` varchar(20) DEFAULT NULL
+  `horoscope` varchar(20) DEFAULT NULL,
+  `isVerified` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `horoscope`) VALUES
-(3, 'adminDLFG', 'demyu@yahoo.com', NULL),
-(4, 'asdfeqwe', 'asdf@email.com', NULL),
-(5, 'pipi', 'vademjanus@rakmail.com', NULL),
-(7, 'Yoyo', 'yahoo@yahoo.com', NULL),
-(8, 'Polmao', 'demyu@yahoo.com', NULL),
-(9, 'lelouch511000', 'demyu@yahoo.com', NULL),
-(11, 'wwr', 'demyu@yahoo.com', NULL),
-(12, 'aas', 'vademjanus@rakmail.com', NULL),
-(13, 'QP', 'qvjglactaotao@tip.edu.ph', 'aquarius');
+INSERT INTO `users` (`id`, `username`, `email`, `horoscope`, `isVerified`) VALUES
+(3, 'adminDLFG', 'demyu@yahoo.com', NULL, NULL),
+(4, 'asdfeqwe', 'asdf@email.com', NULL, NULL),
+(5, 'pipi', 'vademjanus@rakmail.com', NULL, NULL),
+(7, 'Yoyo', 'yahoo@yahoo.com', NULL, NULL),
+(8, 'Polmao', 'demyu@yahoo.com', NULL, NULL),
+(9, 'lelouch511000', 'demyu@yahoo.com', NULL, NULL),
+(11, 'wwr', 'demyu@yahoo.com', NULL, NULL),
+(12, 'aas', 'vademjanus@rakmail.com', NULL, NULL),
+(13, 'QP', 'qvjglactaotao@tip.edu.ph', 'aquarius', NULL);
 
 --
 -- Indexes for dumped tables
