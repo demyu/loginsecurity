@@ -374,19 +374,12 @@ def sendEmail(receiver_email):
     Hi there! \n
     We welcome you to Horoscope! \n
     We check your daily horoscope everyday and we hope you have a nice stay with us \n
-    to verify your email please click on this link %s
-    """, ()
-
+    To verify your email please click on this link 
+    """ + domain
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message)
-
-@app.route("/test/<email>")
-def test(email):
-    sendEmail(email)
-    return "lmao"
-
 
 @app.route('/confirmEmail/<email>/<hash>')
 def confirmEmail(email, hash):
@@ -403,3 +396,4 @@ def confirmEmail(email, hash):
             mysql.connection.commit()
             cur.close()
             return render_template('notice.html')
+app.run(debug= True)
