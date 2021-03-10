@@ -362,7 +362,7 @@ def encry(email):
     return str(my_hmac.hexdigest())
 
 def sendEmail(receiver_email):
-    domain = 'https://seclogin.herokuapp.com/confimEmail/' + receiver_email + "/" + encry(receiver_email)
+    domain = 'https://seclogin.herokuapp.com/confirmEmail/' + receiver_email + "/" + encry(receiver_email)
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "secloginzodiac@gmail.com"  # Enter your address
@@ -396,3 +396,5 @@ def confirmEmail(email, hash):
             mysql.connection.commit()
             cur.close()
             return render_template('notice.html')
+
+app.run(debug=True)
