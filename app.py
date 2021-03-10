@@ -392,7 +392,7 @@ def confirmEmail(email, hash):
         if post != None:
             post = post['id']
             cur = mysql.connection.cursor()
-            cur.execute("Update users set isVerified = 1 where id = %s" , (post))
+            cur.execute("Update users set isVerified = %s where id = %s" , (1,post))
             mysql.connection.commit()
             cur.close()
             return render_template('notice.html')
