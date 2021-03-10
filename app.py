@@ -6,6 +6,8 @@ import re, requests
 from datetime import datetime, date
 import datetime as yolo
 import smtplib, ssl
+import hashlib
+import hmac
 
 app = Flask(__name__)
 
@@ -76,13 +78,14 @@ def login():
             if(userid != None and len(username) != 0):
                 #Checks if password is in correct with username
                 horos = userid['horoscope']
+                isVerified = userid['isVerified']
                 userid = userid['id']
                 cur = mysql.connection.cursor()
                 cur.execute("SELECT password, DATE(created_at) as created_at FROM userpasswords where userid = %s and isActive = %s" , [userid, 1])
                 activePass = cur.fetchone()
                 cur.close()
 
-                if(activePass != None and len(activePass) !=0):
+                if(activePass != None and len(activePass) !=0 and isVerified == "1"):
                     #Checks if password hashed is correct with the inputted password
                     if(check_password_hash(activePass['password'], password)):
                         session['username'] = username
@@ -113,7 +116,7 @@ def login():
                         session['lock'] = 0
                     session['lock'] = int(session['lock']) + 1
                     return render_template('index.html', error = error)
-            error = "Username Does not exist"
+            error = "Username Does not exist or not yet verified"
             session['lock'] = int(session['lock']) + 1
             return render_template('index.html', error = error)
         else:
@@ -152,7 +155,7 @@ def register():
 
             #Insert username password to database 
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO users (username, email, horoscope) VALUES (%s,%s,%s)" , (username, email, horoscope))
+            cur.execute("INSERT INTO users (username, email, horoscope, isVerified) VALUES (%s,%s,%s, %s)" , (username, email, horoscope, 0))
             mysql.connection.commit()
             cur.close()
 
@@ -169,6 +172,10 @@ def register():
             cur.execute("INSERT INTO userpasswords (userid, password, isActive) VALUES (%s,%s,%s)" , (userid, password,1))
             mysql.connection.commit()
             cur.close()
+
+            #Send email to user
+            sendEmail(email)
+
             return redirect(url_for('index'))
         return "Username Already taken"
     else:
@@ -322,23 +329,6 @@ def dailyHoroscope(horoscope):
     #yesterday
     #tomorrow
 
-@app.route('/sendPass')
-def sendPass():
-    port = 465  # For SSL
-    smtp_server = "smtp.gmail.com"
-    sender_email = "secloginzodiac@gmail.com"  # Enter your address
-    receiver_email = "vademjanus@gmail.com"  # Enter receiver address
-    password = "Seclogin51@"
-    message = """\
-    Subject: Hi there
-
-    This message is sent from Python."""
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
-
 @app.route('/sharer/<id>')
 def share(id):
     postId = id
@@ -361,3 +351,55 @@ def inputToHoroscope(horoscopeName,color,compatibility,luckyNumber,description):
     cur.close()
 
     return str(lastid)
+
+def encry(email):
+    message = bytes(email, 'utf-8')
+    shared_secret_key = b'402xy54zy78#'
+    #Generate cryptographic hash using md5
+    my_hmac = hmac.new(shared_secret_key, message, hashlib.sha1)
+    my_hmac.digest()
+    my_hmac_cpy = my_hmac.copy()
+    return str(my_hmac.hexdigest())
+
+def sendEmail(receiver_email):
+    domain = 'https://seclogin.herokuapp.com/confimEmail/' + receiver_email + encry(receiver_email)
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "secloginzodiac@gmail.com"  # Enter your address
+    receiver_email = receiver_email  # Enter receiver address
+    password = "Seclogin51@"
+    message = """\
+    Subject: Email Verification
+
+    Hi there! \n
+    We welcome you to Horoscope! \n
+    We check your daily horoscope everyday and we hope you have a nice stay with us \n
+    to verify your email please click on this link %s
+    """, ()
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+
+@app.route("/test/<email>")
+def test(email):
+    sendEmail(email)
+    return "lmao"
+
+
+@app.route('/confirmEmail/<email>/<hash>')
+def confirmEmail(email, hash):
+    if hash == encry(email):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users where email = %s and isVerified = 0" , [email])
+        post = cur.fetchone()
+        cur.close()
+
+        if post != None:
+            post = post['id']
+            cur = mysql.connection.cursor()
+            cur.execute("Update users set isVerified = 1 where id = %s" , (post))
+            mysql.connection.commit()
+            cur.close()
+            return render_template('notice.html')
