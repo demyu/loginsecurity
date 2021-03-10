@@ -396,4 +396,3 @@ def confirmEmail(email, hash):
             mysql.connection.commit()
             cur.close()
             return render_template('notice.html')
-app.run(debug= True)
