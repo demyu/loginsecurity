@@ -397,4 +397,3 @@ def confirmEmail(email, hash):
             cur.close()
             return render_template('notice.html')
 
-app.run(debug=True)
