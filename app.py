@@ -396,4 +396,6 @@ def confirmEmail(email, hash):
             mysql.connection.commit()
             cur.close()
             return render_template('notice.html')
+        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
