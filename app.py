@@ -295,7 +295,7 @@ def lock():
                 session.pop('lock', None)
                 session.pop('timelock', None)
                 return False
-        session['timelock'] = datetime.now() + yolo.timedelta(0,1) 
+        session['timelock'] = datetime.now() + yolo.timedelta(0,300) 
 
         return True
     return False
