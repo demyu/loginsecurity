@@ -12,19 +12,19 @@ import hmac
 app = Flask(__name__)
 
 #Config for database
-app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
-app.config['MYSQL_USER'] = 'be46b56a23df04'
-app.config['MYSQL_PASSWORD'] = '9f8e51cc'
-app.config['MYSQL_DB'] = 'heroku_d9dccebc3492f63'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
-
-#app.config['MYSQL_HOST'] = 'localhost'
-#app.config['MYSQL_USER'] = 'root'
-#app.config['MYSQL_PASSWORD'] = ''
-#app.config['MYSQL_DB'] = 'securitylogin'
+#app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
+#app.config['MYSQL_USER'] = 'be46b56a23df04'
+#app.config['MYSQL_PASSWORD'] = '9f8e51cc'
+#app.config['MYSQL_DB'] = 'heroku_d9dccebc3492f63'
 #app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 #app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
+
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'securitylogin'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.secret_key = 'M1mrvWyJyVMcLR2vT03XNx5oWRbxnmiu'
 
 mysql = MySQL(app)
 
@@ -75,7 +75,7 @@ def login():
             userid = cur.fetchone()
             cur.close()
 
-            if(userid != None and len(username) != 0):
+            if(userid != None):
                 #Checks if password is in correct with username
                 horos = userid['horoscope']
                 isVerified = userid['isVerified']
@@ -85,7 +85,7 @@ def login():
                 activePass = cur.fetchone()
                 cur.close()
 
-                if(activePass != None and len(activePass) !=0 and isVerified == "1"):
+                if(activePass != None and len(activePass) !=0 and isVerified == 1):
                     #Checks if password hashed is correct with the inputted password
                     if(check_password_hash(activePass['password'], password)):
                         session['username'] = username
@@ -117,6 +117,8 @@ def login():
                     session['lock'] = int(session['lock']) + 1
                     return render_template('index.html', error = error)
             error = "Username Does not exist or not yet verified"
+            if 'lock' not in session:
+                session['lock'] = 0
             session['lock'] = int(session['lock']) + 1
             return render_template('index.html', error = error)
         else:
@@ -293,7 +295,7 @@ def lock():
                 session.pop('lock', None)
                 session.pop('timelock', None)
                 return False
-        session['timelock'] = datetime.now() + yolo.timedelta(0,300) 
+        session['timelock'] = datetime.now() + yolo.timedelta(0,1) 
 
         return True
     return False
@@ -398,4 +400,3 @@ def confirmEmail(email, hash):
             return render_template('notice.html')
         return redirect(url_for('index'))
     return redirect(url_for('index'))
-
