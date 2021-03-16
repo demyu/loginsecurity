@@ -8,8 +8,10 @@ import datetime as yolo
 import smtplib, ssl
 import hashlib
 import hmac
+from flask_sslify import SSLify
 
 app = Flask(__name__)
+sslify = SSLify(app)
 
 #Config for database
 app.config['MYSQL_HOST'] = 'us-cdbr-east-03.cleardb.com'
